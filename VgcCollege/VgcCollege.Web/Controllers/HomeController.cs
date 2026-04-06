@@ -1,31 +1,41 @@
-using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using VgcCollege.Web.Models;
 
 namespace VgcCollege.Web.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger)
-    {
-        _logger = logger;
-    }
-
     public IActionResult Index()
     {
         return View();
     }
-
-    public IActionResult Privacy()
+    
+    [Authorize]
+    public IActionResult Dashboard()
+    {
+        if (User.IsInRole("Admin"))
+        {
+            return RedirectToAction("Index", "Admin");
+        }
+        if (User.IsInRole("Faculty"))
+        {
+            return RedirectToAction("Index", "Faculty");
+        }
+        if (User.IsInRole("Student"))
+        {
+            return RedirectToAction("Index", "Student");
+        }
+        
+        return RedirectToAction("Index");
+    }
+    
+    public IActionResult AccessDenied()
     {
         return View();
     }
-
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    
     public IActionResult Error()
     {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        return View();
     }
 }

@@ -1,0 +1,46 @@
+@model IEnumerable<VgcCollege.Web.Models.CourseEnrolment>
+
+@{
+    ViewData["Title"] = "Students - " + ViewBag.Course?.Name;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Students Enrolled in @ViewBag.Course?.Name</h1>
+    <a href="/Faculty/Index" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Courses
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <table class="table table-striped table-hover">
+            <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Student Number</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Enrolment Date</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var enrolment in Model)
+            {
+                <tr>
+                    <td>@enrolment.StudentProfile?.Name</td>
+                    <td>@enrolment.StudentProfile?.StudentNumber</td>
+                    <td>@enrolment.StudentProfile?.Email</td>
+                    <td>@enrolment.StudentProfile?.Phone</td>
+                    <td>@enrolment.EnrolDate.ToShortDateString()</td>
+                    <td>
+                        <a href="/Faculty/StudentContactDetails?studentId=@enrolment.StudentProfileId" class="btn btn-sm btn-info">
+                            <i class="fas fa-address-card"></i> Contact Details
+                        </a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

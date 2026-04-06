@@ -1,0 +1,70 @@
+@{
+    ViewData["Title"] = "Gradebook - " + ViewBag.Course?.Name;
+    var assignments = ViewBag.Assignments as List<VgcCollege.Web.Models.Assignment>;
+    var students = ViewBag.Students as List<VgcCollege.Web.Models.StudentProfile>;
+    var results = ViewBag.Results as List<VgcCollege.Web.Models.AssignmentResult>;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Gradebook: @ViewBag.Course?.Name</h1>
+    <a href="/Faculty/Index" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Courses
+    </a>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        @foreach (var assignment in assignments)
+                        {
+                            <th class="text-center">
+                                @assignment.Title<br />
+                                <small>(Max: @assignment.MaxScore)</small>
+                            </th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var student in students)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@student?.Name</strong><br />
+                                <small>@student?.StudentNumber</small>
+                            </td>
+                            @foreach (var assignment in assignments)
+                            {
+                                var result = results?.FirstOrDefault(r => r.AssignmentId == assignment.Id && r.StudentProfileId == student?.Id);
+                                <td class="text-center">
+                                    <form asp-action="SaveAssignmentResult" method="post" style="display:inline">
+                                        <input type="hidden" name="assignmentId" value="@assignment.Id" />
+                                        <input type="hidden" name="studentId" value="@student?.Id" />
+                                        <input type="number" name="score" value="@(result?.Score ?? 0)" 
+                                               class="form-control form-control-sm text-center" 
+                                               style="width: 80px; display: inline-block;" 
+                                               min="0" max="@assignment.MaxScore" step="0.5" />
+                                        <button type="submit" class="btn btn-sm btn-primary mt-1">
+                                            <i class="fas fa-save"></i> Save
+                                        </button>
+                                    </form>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

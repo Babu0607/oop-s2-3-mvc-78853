@@ -1,26 +1,28 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using VgcCollege.Web.Models;
 
 namespace VgcCollege.Web.Models;
 
 public class CourseEnrolment
 {
-    [Key]
     public int Id { get; set; }
-
-    // Link to the Student
-    [Required]
-    public int StudentId { get; set; }
     
-    [ForeignKey("StudentId")]
-    public virtual StudentProfile? Student { get; set; }
-
-    // Link to the Course
+    [Required]
+    public int StudentProfileId { get; set; }
+    
     [Required]
     public int CourseId { get; set; }
-
-    [ForeignKey("CourseId")]
-    public virtual Course? Course { get; set; }
-
-    public DateTime EnrolmentDate { get; set; } = DateTime.Now;
+    
+    [Required]
+    [DataType(DataType.Date)]
+    public DateTime EnrolDate { get; set; } = DateTime.Now;
+    
+    [Required]
+    [StringLength(20)]
+    public string Status { get; set; } = "Active"; // Active, Completed, Dropped
+    
+    // Navigation properties
+    public StudentProfile? StudentProfile { get; set; }
+    public Course? Course { get; set; }
+    public ICollection<AttendanceRecord> AttendanceRecords { get; set; } = new List<AttendanceRecord>();
 }

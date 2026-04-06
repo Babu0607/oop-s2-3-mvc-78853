@@ -1,0 +1,91 @@
+@{
+    ViewData["Title"] = "Student Dashboard";
+    var student = ViewBag.Student as VgcCollege.Web.Models.StudentProfile;
+    var enrolments = ViewBag.Enrolments as List<VgcCollege.Web.Models.CourseEnrolment>;
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">My Profile</h5>
+                </div>
+                <div class="card-body">
+                    <h5>Welcome, @student?.Name!</h5>
+                    <p class="text-muted">Student Number: @student?.StudentNumber</p>
+                    <hr />
+                    <p><i class="fas fa-envelope"></i> @student?.Email</p>
+                    <p><i class="fas fa-phone"></i> @student?.Phone</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">My Courses (@(enrolments?.Count ?? 0))</h5>
+                </div>
+                <div class="card-body">
+                    @if (enrolments != null && enrolments.Any())
+                    {
+                        <div class="list-group">
+                            @foreach (var enrolment in enrolments)
+                            {
+                                <a href="/Student/CourseDetails?courseId=@enrolment.CourseId" class="list-group-item list-group-item-action">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">@enrolment.Course?.Name</h6>
+                                            <small class="text-muted">@enrolment.Course?.Branch?.Name</small>
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">Active</span>
+                                    </div>
+                                </a>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">You are not enrolled in any courses yet.</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Quick Links</h5>
+                </div>
+                <div class="card-body text-center">
+                    <a href="/Student/MyGrades" class="btn btn-outline-primary m-2">
+                        <i class="fas fa-chart-line"></i> View Grades
+                    </a>
+                    <a href="/Student/MyAttendance" class="btn btn-outline-warning m-2">
+                        <i class="fas fa-calendar-alt"></i> View Attendance
+                    </a>
+                    <a href="/Student/MyCourses" class="btn btn-outline-success m-2">
+                        <i class="fas fa-book"></i> All Courses
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Academic Info</h5>
+                </div>
+                <div class="card-body">
+                    <p>Check your grades and attendance regularly.</p>
+                    <hr />
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle"></i> Grades are only visible after release by faculty.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

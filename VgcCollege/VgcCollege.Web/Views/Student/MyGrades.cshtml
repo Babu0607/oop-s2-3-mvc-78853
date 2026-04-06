@@ -1,0 +1,100 @@
+@{
+    ViewData["Title"] = "My Grades";
+    var assignmentResults = ViewBag.AssignmentResults as List<VgcCollege.Web.Models.AssignmentResult>;
+    var examResults = ViewBag.ExamResults as List<VgcCollege.Web.Models.ExamResult>;
+}
+
+<h1 class="mb-4">My Grades</h1>
+
+<div class="alert alert-info">
+    <i class="fas fa-info-circle"></i> Only released exam results are visible here. Provisional results are hidden until released by faculty.
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Assignment Results</h5>
+            </div>
+            <div class="card-body">
+                @if (assignmentResults != null && assignmentResults.Any())
+                {
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Assignment</th>
+                                <th>Course</th>
+                                <th>Score</th>
+                                <th>Max Score</th>
+                                <th>Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var result in assignmentResults)
+                            {
+                                var percentage = (result.Score / result.Assignment.MaxScore) * 100;
+                                <tr>
+                                    <td>@result.Assignment?.Title</td>
+                                    <td>@result.Assignment?.Course?.Name</td>
+                                    <td>@result.Score</td>
+                                    <td>@result.Assignment?.MaxScore</td>
+                                    <td>
+                                        <span class="badge @(percentage >= 70 ? "bg-success" : percentage >= 50 ? "bg-warning" : "bg-danger")">
+                                            @percentage.ToString("0.0")%
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="alert alert-info">No assignment results available yet.</div>
+                }
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Exam Results (Released Only)</h5>
+            </div>
+            <div class="card-body">
+                @if (examResults != null && examResults.Any())
+                {
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Exam</th>
+                                <th>Course</th>
+                                <th>Score</th>
+                                <th>Max Score</th>
+                                <th>Grade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var result in examResults)
+                            {
+                                <tr>
+                                    <td>@result.Exam?.Title</td>
+                                    <td>@result.Exam?.Course?.Name</td>
+                                    <td>@result.Score</td>
+                                    <td>@result.Exam?.MaxScore</td>
+                                    <td><span class="badge bg-primary">@result.Grade</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="alert alert-warning">
+                        No exam results released yet. Check back later.
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

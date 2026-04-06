@@ -1,0 +1,38 @@
+# Build outputs
+bin/
+obj/
+*.dll
+*.pdb
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.userselect
+
+# Rider / Visual Studio
+.idea/
+.vs/
+*.csproj.user
+
+# Coverage reports
+*.coverage
+*.coverage.xml
+CoverageResults/
+TestResults/
+
+# dotenv
+.env
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+
+# Published output
+publish/

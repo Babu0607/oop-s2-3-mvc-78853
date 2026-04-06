@@ -8,19 +8,20 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Update="app.db" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true"/>
+        <None Update="app.db" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.24"/>
-        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.24"/>
-        <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.24"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.24"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.24"/>
+        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.24" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.24" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="10.0.5" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.24" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.24" />
     </ItemGroup>
 
     <ItemGroup>
       <_ContentIncludedByDefault Remove="Views\Student\MyProfile.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Student\AvailableCourses.cshtml" />
     </ItemGroup>
 
 </Project>

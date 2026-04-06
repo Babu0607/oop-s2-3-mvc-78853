@@ -2,12 +2,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace VgcCollege.Web.Models;
 
-public class AssignmentResult
+public class ExamResult
 {
     public int Id { get; set; }
     
     [Required]
-    public int AssignmentId { get; set; }
+    public int ExamId { get; set; }
     
     [Required]
     public int StudentProfileId { get; set; }
@@ -16,9 +16,9 @@ public class AssignmentResult
     [Range(0, 1000)]
     public decimal Score { get; set; }
     
-    [StringLength(500)]
-    public string Feedback { get; set; } = string.Empty;
+    [StringLength(2)]
+    public string Grade { get; set; } = string.Empty;
     
-    public Assignment? Assignment { get; set; }
+    public Exam? Exam { get; set; }
     public StudentProfile? StudentProfile { get; set; }
 }

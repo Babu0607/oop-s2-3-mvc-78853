@@ -1,8 +1,56 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Welcome";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Welcome to Vgc College</h1>
+    <p class="lead">Multi-Branch Student & Course Management System</p>
+    <hr />
+    
+    @if (!User.Identity.IsAuthenticated)
+    {
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-graduate fa-3x text-primary"></i>
+                        <h5 class="card-title mt-3">Students</h5>
+                        <p class="card-text">Access your courses, grades, and attendance</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-chalkboard-user fa-3x text-success"></i>
+                        <h5 class="card-title mt-3">Faculty</h5>
+                        <p class="card-text">Manage gradebooks, attendance, and student contact</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-centre">
+                        <i class="fas fa-user-cog fa-3x text-danger"></i>
+                        <h5 class="card-title mt-3">Administrators</h5>
+                        <p class="card-text">Full system management and reporting</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-5">
+            <a href="/Identity/Account/Login" class="btn btn-primary btn-lg">
+                <i class="fas fa-sign-in-alt"></i> Login to System
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="mt-5">
+            <a href="/Home/Dashboard" class="btn btn-primary btn-lg">
+                <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+            </a>
+        </div>
+    }
 </div>

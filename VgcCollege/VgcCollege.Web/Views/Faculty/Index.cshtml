@@ -1,0 +1,54 @@
+@{
+    ViewData["Title"] = "Faculty Dashboard";
+}
+
+<div class="container">
+    <h1 class="mb-4">Welcome, @User.Identity?.Name</h1>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">My Courses (@ViewBag.CourseCount)</h4>
+                </div>
+                <div class="card-body">
+                    @if (Model != null && Model.Any())
+                    {
+                        <div class="row">
+                            @foreach (var facultyCourse in Model)
+                            {
+                                var course = facultyCourse.Course;
+                                <div class="col-md-6 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <h5 class="card-title">@course?.Name</h5>
+                                            <p class="card-text">
+                                                <strong>Branch:</strong> @course?.Branch?.Name<br />
+                                                <strong>Duration:</strong> @course?.StartDate.ToShortDateString() - @course?.EndDate.ToShortDateString()
+                                            </p>
+                                            <div class="btn-group w-100">
+                                                <a href="/Faculty/StudentsByCourse?courseId=@course?.Id" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-users"></i> Students
+                                                </a>
+                                                <a href="/Faculty/Gradebook?courseId=@course?.Id" class="btn btn-sm btn-outline-success">
+                                                    <i class="fas fa-gradebook"></i> Gradebook
+                                                </a>
+                                                <a href="/Faculty/Attendance?courseId=@course?.Id" class="btn btn-sm btn-outline-warning">
+                                                    <i class="fas fa-calendar-check"></i> Attendance
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">No courses assigned to you yet.</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

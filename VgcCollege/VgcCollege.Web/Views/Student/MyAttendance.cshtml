@@ -1,0 +1,68 @@
+@{
+    ViewData["Title"] = "My Attendance";
+    var groupedAttendance = ViewBag.GroupedAttendance as IEnumerable<IGrouping<string, VgcCollege.Web.Models.AttendanceRecord>>;
+}
+
+<h1 class="mb-4">My Attendance Records</h1>
+
+@if (groupedAttendance != null && groupedAttendance.Any())
+{
+    @foreach (var group in groupedAttendance)
+    {
+        var courseName = group.Key;
+        var records = group.ToList();
+        var totalWeeks = records.Count;
+        var presentWeeks = records.Count(r => r.Present);
+        var rate = totalWeeks > 0 ? (presentWeeks * 100 / totalWeeks) : 0;
+        
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">@courseName</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Overall Attendance: </strong>
+                    <div class="progress">
+                        <div class="progress-bar @(rate >= 80 ? "bg-success" : rate >= 60 ? "bg-warning" : "bg-danger")" 
+                             role="progressbar" style="width: @rate%">
+                            @rate%
+                        </div>
+                    </div>
+                </div>
+                
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Week</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var record in records.OrderBy(r => r.WeekNumber))
+                        {
+                            <tr>
+                                <td>Week @record.WeekNumber</td>
+                                <td>@record.Date.ToShortDateString()</td>
+                                <td>
+                                    @if (record.Present)
+                                    {
+                                        <span class="badge bg-success">Present</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Absent</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="alert alert-info">No attendance records found.</div>
+}

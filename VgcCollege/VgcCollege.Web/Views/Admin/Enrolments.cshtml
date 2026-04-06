@@ -1,0 +1,71 @@
+@model IEnumerable<VgcCollege.Web.Models.CourseEnrolment>
+
+@{
+    ViewData["Title"] = "Manage Enrolments";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Student Enrolments</h1>
+    <a href="/Admin/CreateEnrolment" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Add New Enrolment
+    </a>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card">
+    <div class="card-body">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Student Name</th>
+                    <th>Student Number</th>
+                    <th>Course Name</th>
+                    <th>Branch</th>
+                    <th>Enrolment Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var enrolment in Model)
+                {
+                    <tr>
+                        <td>@enrolment.Id</td>
+                        <td>@enrolment.StudentProfile?.Name</td>
+                        <td>@enrolment.StudentProfile?.StudentNumber</td>
+                        <td>@enrolment.Course?.Name</td>
+                        <td>@enrolment.Course?.Branch?.Name</td>
+                        <td>@enrolment.EnrolDate.ToShortDateString()</td>
+                        <td>
+                            @if (enrolment.Status == "Active")
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else if (enrolment.Status == "Completed")
+                            {
+                                <span class="badge bg-info">Completed</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Dropped</span>
+                            }
+                        </td>
+                        <td>
+                            <a href="/Admin/EditEnrolment/@enrolment.Id" class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

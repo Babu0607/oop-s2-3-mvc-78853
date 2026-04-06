@@ -1,0 +1,84 @@
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container">
+    <h1 class="mb-4">Admin Dashboard</h1>
+    
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Branches</h5>
+                    <p class="card-text display-4">@ViewBag.Stats?.BranchCount</p>
+                    <a href="/Admin/Branches" class="btn btn-light">Manage Branches</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Courses</h5>
+                    <p class="card-text display-4">@ViewBag.Stats?.CourseCount</p>
+                    <a href="/Admin/Courses" class="btn btn-light">Manage Courses</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">Students</h5>
+                    <p class="card-text display-4">@ViewBag.Stats?.StudentCount</p>
+                    <a href="/Admin/Students" class="btn btn-light">Manage Students</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Faculty</h5>
+                    <p class="card-text display-4">@ViewBag.Stats?.FacultyCount</p>
+                    <a href="/Admin/Faculty" class="btn btn-light">Manage Faculty</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <a href="/Admin/CreateBranch" class="btn btn-outline-primary m-1">Add Branch</a>
+                    <a href="/Admin/CreateCourse" class="btn btn-outline-success m-1">Add Course</a>
+                    <a href="/Admin/CreateEnrolment" class="btn btn-outline-info m-1">Create Enrolment</a>
+                    <a href="/Admin/ManageExams" class="btn btn-outline-warning m-1">Manage Exams</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Recent Activity</h5>
+                </div>
+                <div class="card-body">
+                    <p>Welcome to the Vgc College Management System</p>
+                    <hr />
+                    <p>Use the navigation menu to manage:</p>
+                    <ul>
+                        <li>Branches and Courses</li>
+                        <li>Student Enrolments</li>
+                        <li>Exam Result Releases</li>
+                        <li>User Management</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace VgcCollege.Web.Models;
 
-public class Assignment
+public class Exam
 {
     public int Id { get; set; }
     
@@ -14,13 +14,15 @@ public class Assignment
     public string Title { get; set; } = string.Empty;
     
     [Required]
+    [DataType(DataType.Date)]
+    public DateTime Date { get; set; }
+    
+    [Required]
     [Range(1, 1000)]
     public int MaxScore { get; set; }
     
-    [Required]
-    [DataType(DataType.Date)]
-    public DateTime DueDate { get; set; }
+    public bool ResultsReleased { get; set; } = false;
     
     public Course? Course { get; set; }
-    public ICollection<AssignmentResult> Results { get; set; } = new List<AssignmentResult>();
+    public ICollection<ExamResult> Results { get; set; } = new List<ExamResult>();
 }

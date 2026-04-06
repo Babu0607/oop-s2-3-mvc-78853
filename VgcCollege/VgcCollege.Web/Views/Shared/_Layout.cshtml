@@ -1,108 +1,154 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>@ViewData["Title"] - VGC College</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
-    @* Bootstrap Icons for the professional look *@
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
-    <link rel="stylesheet" href="~/VgcCollege.Web.styles.css" asp-append-version="true"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Vgc College</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
-<header>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
-            <a class="navbar-brand fw-bold text-primary" asp-area="" asp-controller="Home" asp-action="Index">
-                <i class="bi bi-mortarboard-fill"></i> VGC College
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-university"></i> Vgc College
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                    </li>
-                    
-                    @* 1. Public Links *@
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                    </li>
-
-                    @* 2. ADMIN ONLY: Management Dropdown *@
-                    @if (User.IsInRole("Admin"))
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-building"></i> Management
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="/Admin/Branches"><i class="fas fa-store"></i> Branches</a></li>
+                                    <li><a class="dropdown-item" href="/Admin/Courses"><i class="fas fa-book"></i> Courses</a></li>
+                                    <li><a class="dropdown-item" href="/Admin/Enrolments"><i class="fas fa-user-graduate"></i> Enrolments</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="/Admin/ManageExams"><i class="fas fa-chart-line"></i> Manage Exams</a></li>
+                                </ul>
+                            </li>
+                        }
+                        
+                        @if (User.IsInRole("Faculty"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-chalkboard-user"></i> Teaching
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="/Faculty/Index"><i class="fas fa-list"></i> My Courses</a></li>
+                                    <li><a class="dropdown-item" href="/Faculty/Gradebook"><i class="fas fa-gradebook"></i> Gradebook</a></li>
+                                    <li><a class="dropdown-item" href="/Faculty/Attendance"><i class="fas fa-calendar-check"></i> Attendance</a></li>
+                                </ul>
+                            </li>
+                        }
+                        
+                        @if (User.IsInRole("Student"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Student/Index">
+                                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Student/MyCourses">
+                                    <i class="fas fa-book-open"></i> My Courses
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Student/Grades">
+                                    <i class="fas fa-chart-line"></i> My Grades
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Student/Attendance">
+                                    <i class="fas fa-calendar-alt"></i> Attendance
+                                </a>
+                            </li>
+                        }
+                    }
+                </ul>
+                <ul class="navbar-nav">
+                    @if (User.Identity.IsAuthenticated)
                     {
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-primary fw-bold" href="#" id="adminMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-shield-lock"></i> Management
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle"></i> @User.Identity.Name
                             </a>
-                            <ul class="dropdown-menu shadow-sm" aria-labelledby="adminMenu">
-                                <li><a class="dropdown-item" asp-controller="Management" asp-action="Index">Admin Dashboard</a></li>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><span class="dropdown-item-text"><strong>Role:</strong> 
+                                    @if (User.IsInRole("Admin")) { <span>Admin</span> }
+                                    else if (User.IsInRole("Faculty")) { <span>Faculty</span> }
+                                    else { <span>Student</span> }
+                                </span></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" asp-controller="Management" asp-action="Branches">Manage Branches</a></li>
-                                <li><a class="dropdown-item" asp-controller="Management" asp-action="Courses">Manage Courses</a></li>
-                                <li><a class="dropdown-item" asp-controller="Management" asp-action="Students">Manage Students</a></li>
+                                <li>
+                                    <form asp-area="Identity" asp-page="/Account/Logout" method="post">
+                                        <button type="submit" class="dropdown-item">
+                                            <i class="fas fa-sign-out-alt"></i> Logout
+                                        </button>
+                                    </form>
+                                </li>
                             </ul>
                         </li>
                     }
-                    
-                    @* 3. STUDENT ONLY: My Profile & Browse *@
-                    @if (User.IsInRole("Student"))
+                    else
                     {
                         <li class="nav-item">
-                            <a class="nav-link text-success fw-bold" asp-controller="Student" asp-action="MyProfile">
-                                <i class="bi bi-person-circle"></i> My Portal
+                            <a class="nav-link" href="/Identity/Account/Login">
+                                <i class="fas fa-sign-in-alt"></i> Login
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-primary" asp-controller="Student" asp-action="AvailableCourses">
-                                <i class="bi bi-book"></i> Join Courses
+                            <a class="nav-link" href="/Identity/Account/Register">
+                                <i class="fas fa-user-plus"></i> Register
                             </a>
                         </li>
                     }
                 </ul>
-                <partial name="_LoginPartial"/>
             </div>
         </div>
     </nav>
-</header>
 
-<div class="container">
-    <main role="main" class="pb-3">
-        @* Success Notifications *@
+    <div class="container mt-4">
         @if (TempData["Success"] != null)
         {
-            <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
-                <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        }
-
-        @* Error Notifications *@
-        @if (TempData["Error"] != null)
-        {
-            <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle"></i> @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         }
         
-        @RenderBody()
-    </main>
-</div>
-
-<footer class="border-top footer text-muted bg-light">
-    <div class="container text-center py-3">
-        &copy; 2026 - VGC College Dublin - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy Policy</a>
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle"></i> @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        
+        <main role="main">
+            @RenderBody()
+        </main>
     </div>
-</footer>
 
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="~/js/site.js" asp-append-version="true"></script>
-@await RenderSectionAsync("Scripts", required: false)
+    <footer class="border-top footer text-muted mt-5">
+        <div class="container">
+            &copy; @DateTime.Now.Year - Vgc College Management System
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

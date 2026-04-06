@@ -1,0 +1,77 @@
+@model IEnumerable<VgcCollege.Web.Models.CourseEnrolment>
+
+@{
+    ViewData["Title"] = "Attendance - " + ViewBag.Course?.Name;
+    int currentWeek = ViewBag.CurrentWeek ?? 1;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Attendance Tracking: @ViewBag.Course?.Name</h1>
+    <a href="/Faculty/Index" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Courses
+    </a>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card mb-3">
+    <div class="card-header bg-warning">
+        <h5 class="mb-0">Current Week: @currentWeek</h5>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Student Number</th>
+                        <th class="text-center">Week @currentWeek</th>
+                        <th class="text-center">Attendance Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var enrolment in Model)
+                    {
+                        var attendance = enrolment.AttendanceRecords?.FirstOrDefault(a => a.WeekNumber == currentWeek);
+                        var totalWeeks = enrolment.AttendanceRecords?.Count() ?? 0;
+                        var presentWeeks = enrolment.AttendanceRecords?.Count(a => a.Present) ?? 0;
+                        var rate = totalWeeks > 0 ? (presentWeeks * 100 / totalWeeks) : 0;
+                        
+                        <tr>
+                            <td>@enrolment.StudentProfile?.Name</td>
+                            <td>@enrolment.StudentProfile?.StudentNumber</td>
+                            <td class="text-center">
+                                <form asp-action="MarkAttendance" method="post" style="display:inline">
+                                    <input type="hidden" name="enrolmentId" value="@enrolment.Id" />
+                                    <input type="hidden" name="weekNumber" value="@currentWeek" />
+                                    <input type="hidden" name="date" value="@DateTime.Now" />
+                                    <select name="present" class="form-select form-select-sm d-inline-block w-auto" onchange="this.form.submit()">
+                                        <option value="true" selected="@(attendance?.Present == true)">Present</option>
+                                        <option value="false" selected="@(attendance?.Present == false)">Absent</option>
+                                    </select>
+                                </form>
+                            </td>
+                            <td class="text-center">
+                                <div class="progress">
+                                    <div class="progress-bar @(rate >= 80 ? "bg-success" : rate >= 60 ? "bg-warning" : "bg-danger")" 
+                                         role="progressbar" style="width: @rate%">
+                                        @rate%
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
