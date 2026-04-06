@@ -1,0 +1,51 @@
+@using VgcCollege.Web.Models
+@model IEnumerable<Course>
+@{
+    ViewData["Title"] = "Join a Course";
+}
+
+<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold text-primary">Available Courses</h2>
+        <p class="lead text-muted">Select a course below to start your journey at VGC College.</p>
+    </div>
+
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm transition-hover">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title fw-bold mb-0">@item.Name</h5>
+                            <span class="badge bg-info text-dark">@item.Branch?.Name</span>
+                        </div>
+                        <hr class="my-3">
+                        <p class="card-text">
+                            <strong><i class="bi bi-calendar3"></i> Schedule:</strong><br />
+                            <span class="small text-muted">
+                                @item.StartDate.ToShortDateString() - @item.EndDate.ToShortDateString()
+                            </span>
+                        </p>
+                    </div>
+                    <div class="card-footer bg-white border-0 pb-4">
+                        <form asp-action="Enroll" method="post">
+                            <input type="hidden" name="courseId" value="@item.Id" />
+                            <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
+                                <i class="bi bi-plus-circle"></i> Enroll Now
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .transition-hover:hover {
+        transform: translateY(-5px);
+        transition: transform 0.3s ease;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+</style>
