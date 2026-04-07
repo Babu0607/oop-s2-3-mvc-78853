@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore
+      run: dotnet restore VgcCollege/VgcCollege.Web/VgcCollege.Web.csproj
+
+    - name: Build Web
+      run: dotnet build VgcCollege/VgcCollege.Web/VgcCollege.Web.csproj --configuration Release --no-restore
+
+    - name: Build Tests
+      run: dotnet build VgcCollege/VgcCollege.Tests/VgcCollege.Tests.csproj --configuration Release
+
+    - name: Test
+      run: dotnet test VgcCollege/VgcCollege.Tests/VgcCollege.Tests.csproj --configuration Release --no-build --verbosity normal
