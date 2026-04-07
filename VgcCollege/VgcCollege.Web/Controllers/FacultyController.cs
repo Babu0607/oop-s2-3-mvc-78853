@@ -15,29 +15,89 @@ public class FacultyController : Controller
     {
         _context = context;
     }
-    
     public async Task<IActionResult> Index()
     {
-        var facultyId = await GetCurrentFacultyId();
-        if (facultyId == null)
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        Console.WriteLine($"=== Dashboard ===");
+        Console.WriteLine($"UserId: {userId}");
+        
+        var faculty = await _context.FacultyProfiles
+            .FirstOrDefaultAsync(f => f.IdentityUserId == userId);
+        
+        if (faculty == null)
+        {
+            Console.WriteLine("Faculty not found!");
+            return RedirectToAction("AccessDenied", "Home");
+        }
+        
+        Console.WriteLine($"Faculty found: {faculty.Name} (ID: {faculty.Id})");
+        
+        var myCourses = await _context.FacultyCourses
+            .Where(fc => fc.FacultyProfileId == faculty.Id)
+            .Include(fc => fc.Course)
+            .ThenInclude(c => c.Branch)
+            .ToListAsync();
+        
+        Console.WriteLine($"Courses found: {myCourses.Count}");
+        
+        return View(myCourses);
+    }
+    public async Task<IActionResult> Gradebook(int courseId)
+    {
+        Console.WriteLine($"=== Gradebook Debug ===");
+        Console.WriteLine($"CourseId received: {courseId}");
+        
+        if (!User.Identity.IsAuthenticated)
+        {
+            Console.WriteLine("ERROR: User not authenticated");
+            return RedirectToAction("AccessDenied", "Home");
+        }
+        
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        Console.WriteLine($"UserId: {userId}");
+        
+        var faculty = await _context.FacultyProfiles
+            .FirstOrDefaultAsync(f => f.IdentityUserId == userId);
+        
+        if (faculty == null)
+        {
+            Console.WriteLine("ERROR: No faculty profile found");
+            return RedirectToAction("AccessDenied", "Home");
+        }
+        
+        Console.WriteLine($"Faculty found: {faculty.Name} (ID: {faculty.Id})");
+        
+        var isAssigned = await _context.FacultyCourses
+            .AnyAsync(fc => fc.FacultyProfileId == faculty.Id && fc.CourseId == courseId);
+        
+        Console.WriteLine($"Is assigned to course {courseId}: {isAssigned}");
+        
+        if (!isAssigned)
+        {
+            Console.WriteLine("ERROR: Faculty not assigned to this course");
+            return RedirectToAction("AccessDenied", "Home");
+        }
+        
+        ViewBag.CourseId = courseId;
+        ViewBag.FacultyName = faculty.Name;
+        
+        return View();
+    }
+    public async Task<IActionResult> StudentsByCourse(int courseId)
+    {
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        var faculty = await _context.FacultyProfiles
+            .FirstOrDefaultAsync(f => f.IdentityUserId == userId);
+        
+        if (faculty == null)
         {
             return RedirectToAction("AccessDenied", "Home");
         }
         
-        var myCourses = await _context.FacultyCourses
-            .Where(fc => fc.FacultyProfileId == facultyId)
-            .Include(fc => fc.Course)
-            .ThenInclude(c => c!.Branch)
-            .ToListAsync();
+        var isAssigned = await _context.FacultyCourses
+            .AnyAsync(fc => fc.FacultyProfileId == faculty.Id && fc.CourseId == courseId);
         
-        ViewBag.CourseCount = myCourses.Count;
-        return View(myCourses);
-    }
-    
-    public async Task<IActionResult> StudentsByCourse(int courseId)
-    {
-        var facultyId = await GetCurrentFacultyId();
-        if (facultyId == null || !await IsFacultyAssignedToCourse(facultyId.Value, courseId))
+        if (!isAssigned)
         {
             return RedirectToAction("AccessDenied", "Home");
         }
@@ -49,121 +109,24 @@ public class FacultyController : Controller
         
         var course = await _context.Courses.FindAsync(courseId);
         ViewBag.Course = course;
-        ViewBag.CourseId = courseId;
         
         return View(enrolments);
     }
-    
-    public async Task<IActionResult> Gradebook(int courseId)
-    {
-        var facultyId = await GetCurrentFacultyId();
-        if (facultyId == null || !await IsFacultyAssignedToCourse(facultyId.Value, courseId))
-        {
-            return RedirectToAction("AccessDenied", "Home");
-        }
-        
-        var assignments = await _context.Assignments
-            .Where(a => a.CourseId == courseId)
-            .ToListAsync();
-        
-        var students = await _context.CourseEnrolments
-            .Include(e => e.StudentProfile)
-            .Where(e => e.CourseId == courseId && e.Status == "Active")
-            .Select(e => e.StudentProfile)
-            .ToListAsync();
-        
-        var results = await _context.AssignmentResults
-            .Include(r => r.Assignment)
-            .Where(r => assignments.Select(a => a.Id).Contains(r.AssignmentId))
-            .ToListAsync();
-        
-        var course = await _context.Courses.FindAsync(courseId);
-        ViewBag.Course = course;
-        ViewBag.CourseId = courseId;
-        ViewBag.Assignments = assignments;
-        ViewBag.Students = students;
-        ViewBag.Results = results;
-        
-        return View();
-    }
-    
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> SaveAssignmentResult(int assignmentId, int studentId, decimal score, string feedback)
-    {
-        var assignment = await _context.Assignments.FindAsync(assignmentId);
-        if (assignment == null)
-        {
-            return NotFound();
-        }
-        
-        var facultyId = await GetCurrentFacultyId();
-        if (facultyId == null || !await IsFacultyAssignedToCourse(facultyId.Value, assignment.CourseId))
-        {
-            return RedirectToAction("AccessDenied", "Home");
-        }
-        
-        var result = await _context.AssignmentResults
-            .FirstOrDefaultAsync(r => r.AssignmentId == assignmentId && r.StudentProfileId == studentId);
-        
-        if (result == null)
-        {
-            result = new AssignmentResult
-            {
-                AssignmentId = assignmentId,
-                StudentProfileId = studentId,
-                Score = score,
-                Feedback = feedback ?? string.Empty
-            };
-            _context.AssignmentResults.Add(result);
-        }
-        else
-        {
-            result.Score = score;
-            result.Feedback = feedback ?? string.Empty;
-            _context.Update(result);
-        }
-        
-        await _context.SaveChangesAsync();
-        TempData["Success"] = "Result saved successfully!";
-        
-        return RedirectToAction("Gradebook", new { courseId = assignment.CourseId });
-    }
-    
-    public async Task<IActionResult> StudentContactDetails(int studentId)
-    {
-        var facultyId = await GetCurrentFacultyId();
-        if (facultyId == null)
-        {
-            return RedirectToAction("AccessDenied", "Home");
-        }
-        
-        var isAuthorized = await _context.CourseEnrolments
-            .Where(e => e.StudentProfileId == studentId)
-            .Join(_context.FacultyCourses,
-                e => e.CourseId,
-                fc => fc.CourseId,
-                (e, fc) => fc.FacultyProfileId)
-            .AnyAsync(fid => fid == facultyId);
-        
-        if (!isAuthorized)
-        {
-            return RedirectToAction("AccessDenied", "Home");
-        }
-        
-        var student = await _context.StudentProfiles.FindAsync(studentId);
-        if (student == null)
-        {
-            return NotFound();
-        }
-        
-        return View(student);
-    }
-    
     public async Task<IActionResult> Attendance(int courseId)
     {
-        var facultyId = await GetCurrentFacultyId();
-        if (facultyId == null || !await IsFacultyAssignedToCourse(facultyId.Value, courseId))
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        var faculty = await _context.FacultyProfiles
+            .FirstOrDefaultAsync(f => f.IdentityUserId == userId);
+        
+        if (faculty == null)
+        {
+            return RedirectToAction("AccessDenied", "Home");
+        }
+        
+        var isAssigned = await _context.FacultyCourses
+            .AnyAsync(fc => fc.FacultyProfileId == faculty.Id && fc.CourseId == courseId);
+        
+        if (!isAssigned)
         {
             return RedirectToAction("AccessDenied", "Home");
         }
@@ -176,7 +139,6 @@ public class FacultyController : Controller
         
         var course = await _context.Courses.FindAsync(courseId);
         ViewBag.Course = course;
-        ViewBag.CourseId = courseId;
         ViewBag.CurrentWeek = GetCurrentWeekNumber();
         
         return View(enrolments);
@@ -193,12 +155,6 @@ public class FacultyController : Controller
         if (enrolment == null)
         {
             return NotFound();
-        }
-        
-        var facultyId = await GetCurrentFacultyId();
-        if (facultyId == null || !await IsFacultyAssignedToCourse(facultyId.Value, enrolment.CourseId))
-        {
-            return RedirectToAction("AccessDenied", "Home");
         }
         
         var attendance = await _context.AttendanceRecords
@@ -226,23 +182,33 @@ public class FacultyController : Controller
         
         return RedirectToAction("Attendance", new { courseId = enrolment.CourseId });
     }
-    private async Task<int?> GetCurrentFacultyId()
+    public async Task<IActionResult> StudentContactDetails(int studentId)
     {
         var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        if (userId == null) return null;
-        
         var faculty = await _context.FacultyProfiles
             .FirstOrDefaultAsync(f => f.IdentityUserId == userId);
         
-        return faculty?.Id;
+        if (faculty == null)
+        {
+            return RedirectToAction("AccessDenied", "Home");
+        }
+        
+        var isAuthorized = await _context.CourseEnrolments
+            .Where(e => e.StudentProfileId == studentId)
+            .Join(_context.FacultyCourses,
+                e => e.CourseId,
+                fc => fc.CourseId,
+                (e, fc) => fc.FacultyProfileId)
+            .AnyAsync(fid => fid == faculty.Id);
+        
+        if (!isAuthorized)
+        {
+            return RedirectToAction("AccessDenied", "Home");
+        }
+        
+        var student = await _context.StudentProfiles.FindAsync(studentId);
+        return View(student);
     }
-    
-    private async Task<bool> IsFacultyAssignedToCourse(int facultyId, int courseId)
-    {
-        return await _context.FacultyCourses
-            .AnyAsync(fc => fc.FacultyProfileId == facultyId && fc.CourseId == courseId);
-    }
-    
     private int GetCurrentWeekNumber()
     {
         var startDate = new DateTime(2024, 9, 1);

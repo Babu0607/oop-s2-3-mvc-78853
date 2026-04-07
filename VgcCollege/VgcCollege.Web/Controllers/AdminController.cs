@@ -8,7 +8,7 @@ using VgcCollege.Web.Models;
 namespace VgcCollege.Web.Controllers;
 
 [Authorize(Roles = "Admin")]
-public class AdminController: Controller
+public class AdminController : Controller
 {
     private readonly ApplicationDbContext _context;
     
@@ -16,7 +16,6 @@ public class AdminController: Controller
     {
         _context = context;
     }
-    
     public async Task<IActionResult> Index()
     {
         var stats = new
@@ -30,7 +29,6 @@ public class AdminController: Controller
         ViewBag.Stats = stats;
         return View();
     }
-    
     public async Task<IActionResult> Branches()
     {
         var branches = await _context.Branches.ToListAsync();
@@ -47,13 +45,34 @@ public class AdminController: Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateBranch(Branch branch)
     {
+        Console.WriteLine($"=== Creating Branch ===");
+        Console.WriteLine($"Name: {branch.Name}");
+        Console.WriteLine($"Address: {branch.Address}");
+        
         if (ModelState.IsValid)
         {
-            _context.Branches.Add(branch);
-            await _context.SaveChangesAsync();
-            TempData["Success"] = "Branch created successfully!";
-            return RedirectToAction(nameof(Branches));
+            try
+            {
+                _context.Branches.Add(branch);
+                await _context.SaveChangesAsync();
+                Console.WriteLine($"SUCCESS! Branch saved with ID: {branch.Id}");
+                TempData["Success"] = "Branch created successfully!";
+                return RedirectToAction(nameof(Branches));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ERROR: {ex.Message}");
+                TempData["Error"] = $"Error: {ex.Message}";
+                return View(branch);
+            }
         }
+        
+        var errors = ModelState.Values.SelectMany(v => v.Errors);
+        foreach (var error in errors)
+        {
+            Console.WriteLine($"Validation Error: {error.ErrorMessage}");
+        }
+        
         return View(branch);
     }
     
@@ -84,25 +103,19 @@ public class AdminController: Controller
                 _context.Update(branch);
                 await _context.SaveChangesAsync();
                 TempData["Success"] = "Branch updated successfully!";
+                return RedirectToAction(nameof(Branches));
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!BranchExists(branch.Id))
+                if (!_context.Branches.Any(e => e.Id == branch.Id))
                 {
                     return NotFound();
                 }
                 throw;
             }
-            return RedirectToAction(nameof(Branches));
         }
         return View(branch);
     }
-    
-    private bool BranchExists(int id)
-    {
-        return _context.Branches.Any(e => e.Id == id);
-    }
-    
     public async Task<IActionResult> Courses()
     {
         var courses = await _context.Courses
@@ -122,13 +135,35 @@ public class AdminController: Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateCourse(Course course)
     {
+        Console.WriteLine($"=== Creating Course ===");
+        Console.WriteLine($"Name: {course.Name}");
+        Console.WriteLine($"BranchId: {course.BranchId}");
+        
         if (ModelState.IsValid)
         {
-            _context.Courses.Add(course);
-            await _context.SaveChangesAsync();
-            TempData["Success"] = "Course created successfully!";
-            return RedirectToAction(nameof(Courses));
+            try
+            {
+                _context.Courses.Add(course);
+                await _context.SaveChangesAsync();
+                Console.WriteLine($"SUCCESS! Course saved with ID: {course.Id}");
+                TempData["Success"] = "Course created successfully!";
+                return RedirectToAction(nameof(Courses));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ERROR: {ex.Message}");
+                TempData["Error"] = $"Error: {ex.Message}";
+                ViewBag.Branches = new SelectList(await _context.Branches.ToListAsync(), "Id", "Name");
+                return View(course);
+            }
         }
+        
+        var errors = ModelState.Values.SelectMany(v => v.Errors);
+        foreach (var error in errors)
+        {
+            Console.WriteLine($"Validation Error: {error.ErrorMessage}");
+        }
+        
         ViewBag.Branches = new SelectList(await _context.Branches.ToListAsync(), "Id", "Name");
         return View(course);
     }
@@ -161,26 +196,20 @@ public class AdminController: Controller
                 _context.Update(course);
                 await _context.SaveChangesAsync();
                 TempData["Success"] = "Course updated successfully!";
+                return RedirectToAction(nameof(Courses));
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CourseExists(course.Id))
+                if (!_context.Courses.Any(e => e.Id == course.Id))
                 {
                     return NotFound();
                 }
                 throw;
             }
-            return RedirectToAction(nameof(Courses));
         }
         ViewBag.Branches = new SelectList(await _context.Branches.ToListAsync(), "Id", "Name", course.BranchId);
         return View(course);
     }
-    
-    private bool CourseExists(int id)
-    {
-        return _context.Courses.Any(e => e.Id == id);
-    }
-    
     public async Task<IActionResult> Enrolments()
     {
         var enrolments = await _context.CourseEnrolments
@@ -250,28 +279,22 @@ public class AdminController: Controller
                 _context.Update(enrolment);
                 await _context.SaveChangesAsync();
                 TempData["Success"] = "Enrolment updated successfully!";
+                return RedirectToAction(nameof(Enrolments));
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!EnrolmentExists(enrolment.Id))
+                if (!_context.CourseEnrolments.Any(e => e.Id == enrolment.Id))
                 {
                     return NotFound();
                 }
                 throw;
             }
-            return RedirectToAction(nameof(Enrolments));
         }
         
         ViewBag.Students = new SelectList(await _context.StudentProfiles.ToListAsync(), "Id", "Name", enrolment.StudentProfileId);
         ViewBag.Courses = new SelectList(await _context.Courses.Include(c => c.Branch).ToListAsync(), "Id", "Name", enrolment.CourseId);
         return View(enrolment);
     }
-    
-    private bool EnrolmentExists(int id)
-    {
-        return _context.CourseEnrolments.Any(e => e.Id == id);
-    }
-    
     public async Task<IActionResult> ManageExams()
     {
         var exams = await _context.Exams
@@ -281,6 +304,7 @@ public class AdminController: Controller
     }
     
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> ToggleResultRelease(int examId)
     {
         var exam = await _context.Exams.FindAsync(examId);
@@ -292,7 +316,6 @@ public class AdminController: Controller
         }
         return RedirectToAction(nameof(ManageExams));
     }
-    
     public async Task<IActionResult> Students()
     {
         var students = await _context.StudentProfiles

@@ -1,15 +1,18 @@
+@model IEnumerable<VgcCollege.Web.Models.AttendanceRecord>
+
 @{
     ViewData["Title"] = "My Attendance";
-    var groupedAttendance = ViewBag.GroupedAttendance as IEnumerable<IGrouping<string, VgcCollege.Web.Models.AttendanceRecord>>;
 }
 
 <h1 class="mb-4">My Attendance Records</h1>
 
-@if (groupedAttendance != null && groupedAttendance.Any())
+@if (Model != null && Model.Any())
 {
-    @foreach (var group in groupedAttendance)
+    var groupedByCourse = Model.GroupBy(a => a.CourseEnrolment?.Course?.Name);
+    
+    foreach (var group in groupedByCourse)
     {
-        var courseName = group.Key;
+        var courseName = group.Key ?? "Unknown Course";
         var records = group.ToList();
         var totalWeeks = records.Count;
         var presentWeeks = records.Count(r => r.Present);
@@ -66,3 +69,7 @@ else
 {
     <div class="alert alert-info">No attendance records found.</div>
 }
+
+<div class="mt-3">
+    <a href="/Student" class="btn btn-secondary">Back to Dashboard</a>
+</div>

@@ -27,7 +27,7 @@ public class StudentController : Controller
         var student = await _context.StudentProfiles.FindAsync(studentId);
         var enrolments = await _context.CourseEnrolments
             .Include(e => e.Course)
-            .ThenInclude(c => c!.Branch)
+            .ThenInclude(c => c.Branch)
             .Where(e => e.StudentProfileId == studentId && e.Status == "Active")
             .ToListAsync();
         
@@ -47,7 +47,7 @@ public class StudentController : Controller
         
         var enrolments = await _context.CourseEnrolments
             .Include(e => e.Course)
-            .ThenInclude(c => c!.Branch)
+            .ThenInclude(c => c.Branch)
             .Where(e => e.StudentProfileId == studentId)
             .ToListAsync();
         
@@ -64,14 +64,14 @@ public class StudentController : Controller
         
         var assignmentResults = await _context.AssignmentResults
             .Include(r => r.Assignment)
-            .ThenInclude(a => a!.Course)
+            .ThenInclude(a => a.Course)
             .Where(r => r.StudentProfileId == studentId)
             .ToListAsync();
         
         var examResults = await _context.ExamResults
             .Include(r => r.Exam)
-            .ThenInclude(e => e!.Course)
-            .Where(r => r.StudentProfileId == studentId && r.Exam!.ResultsReleased == true)
+            .ThenInclude(e => e.Course)
+            .Where(r => r.StudentProfileId == studentId && r.Exam.ResultsReleased == true)
             .ToListAsync();
         
         ViewBag.AssignmentResults = assignmentResults;
@@ -79,7 +79,6 @@ public class StudentController : Controller
         
         return View();
     }
-    
     public async Task<IActionResult> MyAttendance()
     {
         var studentId = await GetCurrentStudentId();
@@ -90,20 +89,13 @@ public class StudentController : Controller
         
         var attendanceRecords = await _context.AttendanceRecords
             .Include(a => a.CourseEnrolment)
-            .ThenInclude(e => e!.Course)
-            .Where(a => a.CourseEnrolment!.StudentProfileId == studentId)
+            .ThenInclude(e => e.Course)
+            .Where(a => a.CourseEnrolment.StudentProfileId == studentId)
             .OrderBy(a => a.Date)
             .ToListAsync();
         
-        var groupedByCourse = attendanceRecords
-            .GroupBy(a => a.CourseEnrolment?.Course?.Name)
-            .ToList();
-        
-        ViewBag.GroupedAttendance = groupedByCourse;
-        
-        return View();
+        return View(attendanceRecords);
     }
-    
     public async Task<IActionResult> CourseDetails(int courseId)
     {
         var studentId = await GetCurrentStudentId();
@@ -137,7 +129,7 @@ public class StudentController : Controller
             .ToListAsync();
         
         var examResults = await _context.ExamResults
-            .Where(r => r.StudentProfileId == studentId && exams.Select(e => e.Id).Contains(r.ExamId) && r.Exam!.ResultsReleased == true)
+            .Where(r => r.StudentProfileId == studentId && exams.Select(e => e.Id).Contains(r.ExamId) && r.Exam.ResultsReleased == true)
             .ToListAsync();
         
         ViewBag.Course = course;
@@ -148,6 +140,12 @@ public class StudentController : Controller
         
         return View();
     }
+    [HttpGet]
+    public IActionResult Test()
+    {
+        return Content("Student Controller is working! Available URLs: /Student, /Student/MyCourses, /Student/MyGrades, /Student/MyAttendance");
+    }
+    
     private async Task<int?> GetCurrentStudentId()
     {
         var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;

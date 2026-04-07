@@ -9,117 +9,111 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>@course?.Name</h1>
-    <a href="/Student/MyCourses" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i> Back to Courses
-    </a>
+    <a href="/Student/MyCourses" class="btn btn-secondary">Back to Courses</a>
 </div>
 
-<div class="row">
-    <div class="col-md-12">
-        <div class="card mb-4">
-            <div class="card-header bg-info text-white">
-                <h5 class="mb-0">Course Information</h5>
-            </div>
-            <div class="card-body">
-                <p><strong>Branch:</strong> @course?.Branch?.Name</p>
-                <p><strong>Duration:</strong> @course?.StartDate.ToShortDateString() - @course?.EndDate.ToShortDateString()</p>
-            </div>
-        </div>
-        
-        <div class="card mb-4">
-            <div class="card-header bg-success text-white">
-                <h5 class="mb-0">Assignments</h5>
-            </div>
-            <div class="card-body">
-                @if (assignments != null && assignments.Any())
-                {
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Title</th>
-                                <th>Due Date</th>
-                                <th>Max Score</th>
-                                <th>My Score</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var assignment in assignments)
-                            {
-                                var result = assignmentResults?.FirstOrDefault(r => r.AssignmentId == assignment.Id);
-                                <tr>
-                                    <td>@assignment.Title</td>
-                                    <td>@assignment.DueDate.ToShortDateString()</td>
-                                    <td>@assignment.MaxScore</td>
-                                    <td>@(result?.Score.ToString() ?? "Not graded")</td>
-                                    <td>
-                                        @if (result != null)
-                                        {
-                                            <span class="badge bg-success">Graded</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-warning">Pending</span>
-                                        }
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                }
-                else
-                {
-                    <div class="alert alert-info">No assignments for this course.</div>
-                }
-            </div>
-        </div>
-        
-        <div class="card">
-            <div class="card-header bg-warning">
-                <h5 class="mb-0">Exams</h5>
-            </div>
-            <div class="card-body">
-                @if (exams != null && exams.Any())
-                {
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Title</th>
-                                <th>Date</th>
-                                <th>Max Score</th>
-                                <th>My Score</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var exam in exams)
-                            {
-                                var result = examResults?.FirstOrDefault(r => r.ExamId == exam.Id);
-                                <tr>
-                                    <td>@exam.Title</td>
-                                    <td>@exam.Date.ToShortDateString()</td>
-                                    <td>@exam.MaxScore</td>
-                                    <td>@(result?.Score.ToString() ?? "Not available")</td>
-                                    <td>
-                                        @if (exam.ResultsReleased)
-                                        {
-                                            <span class="badge bg-success">Released</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-secondary">Provisional (Hidden)</span>
-                                        }
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                }
-                else
-                {
-                    <div class="alert alert-info">No exams for this course.</div>
-                }
-            </div>
-        </div>
+<div class="card mb-4">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0">Course Information</h5>
+    </div>
+    <div class="card-body">
+        <p><strong>Branch:</strong> @course?.Branch?.Name</p>
+        <p><strong>Duration:</strong> @course?.StartDate.ToShortDateString() - @course?.EndDate.ToShortDateString()</p>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0">Assignments</h5>
+    </div>
+    <div class="card-body">
+        @if (assignments != null && assignments.Any())
+        {
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Due Date</th>
+                        <th>Max Score</th>
+                        <th>My Score</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var assignment in assignments)
+                    {
+                        var result = assignmentResults?.FirstOrDefault(r => r.AssignmentId == assignment.Id);
+                        <tr>
+                            <td>@assignment.Title</td>
+                            <td>@assignment.DueDate.ToShortDateString()</td>
+                            <td>@assignment.MaxScore</td>
+                            <td>@(result?.Score.ToString() ?? "Not graded")</td>
+                            <td>
+                                @if (result != null)
+                                {
+                                    <span class="badge bg-success">Graded</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning">Pending</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="alert alert-info">No assignments for this course.</div>
+        }
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-warning">
+        <h5 class="mb-0">Exams</h5>
+    </div>
+    <div class="card-body">
+        @if (exams != null && exams.Any())
+        {
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Date</th>
+                        <th>Max Score</th>
+                        <th>My Score</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var exam in exams)
+                    {
+                        var result = examResults?.FirstOrDefault(r => r.ExamId == exam.Id);
+                        <tr>
+                            <td>@exam.Title</td>
+                            <td>@exam.Date.ToShortDateString()</td>
+                            <td>@exam.MaxScore</td>
+                            <td>@(result?.Score.ToString() ?? "Not available")</td>
+                            <td>
+                                @if (exam.ResultsReleased)
+                                {
+                                    <span class="badge bg-success">Released</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Provisional (Hidden)</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="alert alert-info">No exams for this course.</div>
+        }
     </div>
 </div>

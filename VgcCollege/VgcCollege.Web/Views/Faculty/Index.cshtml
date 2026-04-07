@@ -1,3 +1,6 @@
+@using System.Linq
+@model IEnumerable<VgcCollege.Web.Models.FacultyCourse>
+
 @{
     ViewData["Title"] = "Faculty Dashboard";
 }
@@ -9,7 +12,7 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">My Courses (@ViewBag.CourseCount)</h4>
+                    <h4 class="mb-0">My Courses (@(Model?.Count() ?? 0))</h4>
                 </div>
                 <div class="card-body">
                     @if (Model != null && Model.Any())
